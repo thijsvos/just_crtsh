@@ -11,7 +11,8 @@ async def fetch_subdomains(domain_to_fetch: str) -> List[str]:
     url = f"https://crt.sh/?q={domain_to_fetch}&output=json"
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(url)
+            timeout = httpx.Timeout(timeout=30.0, read=None) # Sometimes crt.sh is slow, so wait 30 sec.
+            response = await client.get(url, timeout=timeout)
             if "application/json" not in response.headers.get("content-type", ""):
                 raise ValueError("Response is not in JSON format")
 
